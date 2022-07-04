@@ -8,7 +8,7 @@ import { Contract } from "web3-eth-contract";
 import { IRequest } from "../../types/IRequest";
 
 class PropertyService {
-  // Creating contract model
+  // Creating contract manager
   private myContractManager: IGifflarContractManager = createContractManager();
 
   constructor(web3?: IWeb3, accountPrivateKey?: string) {
