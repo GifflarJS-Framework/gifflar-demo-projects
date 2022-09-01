@@ -6,13 +6,17 @@ import { IGifflarManager } from "gifflar-library/bin/modules/managing/gifflarMan
 import { IGifflarContract } from "gifflar-library/bin/modules/managing/gifflarContract/types/IGifflarContract";
 import { IContractJson } from "gifflar-library/bin/modules/models/toplevels/contract/types/IContractJson";
 import { IContractDeployDTO } from "gifflar-library/bin/modules/managing/gifflarContract/types/IContractDeployDTO";
+import { INetworkConfig } from "gifflar-library/bin/modules/deployer/types/INetworkConfig";
 
 class PropertyService {
   // Creating contract manager
   private myGifflarManager: IGifflarManager = createGifflarManager();
 
   constructor(accountPrivateKey?: string) {
-    this.myGifflarManager.setDeployConfig(networks[defaultNetwork]);
+    const network: INetworkConfig = networks.filter((network) => {
+      return network.key === defaultNetwork;
+    })[0];
+    this.myGifflarManager.setDeployConfig(network);
     if (accountPrivateKey) this.myGifflarManager.addSigner(accountPrivateKey);
   }
 
@@ -30,7 +34,7 @@ class PropertyService {
         requestData[key].type,
         key,
         "public",
-        requestData[key].type === "string"
+        requestData[key].type.regularType === "string"
           ? `"${requestData[key].value}"`
           : `${requestData[key].value}`
       );
@@ -40,7 +44,10 @@ class PropertyService {
         // Creating updateable function if needed
         myContract
           .createFunction(`set${key}`, "public", [
-            { name: `new${key}`, type: requestData[key].type.regularType },
+            {
+              name: `new${key}`,
+              type: requestData[key].type.regularType || "",
+            },
           ])
           .setAssignment(key, `${`new${key}`}`);
       }
@@ -56,6 +63,18 @@ class PropertyService {
           { name: `newRenter`, type: "address" },
         ])
         .setAssignment(`renter`, `newRenter`);
+
+      // Creating function to pay rent
+      myContract
+        .createFunction(
+          "payRent",
+          "public",
+          [{ type: "address", name: "_renter" }],
+          [],
+          "payable"
+        )
+        .setRequire("_renter == renter", "Payer is not renter.")
+        .setMethodCall("owner", "transfer", "msg.value");
     }
 
     return myContract.toJson();

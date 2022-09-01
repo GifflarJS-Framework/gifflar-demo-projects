@@ -12,7 +12,7 @@ const request1: IRequest = {
     },
     propertyAddress: {
       value: "Address property 1",
-      type: { regularType: "address" },
+      type: { regularType: "string" },
       isUpdateable: false,
     },
     number: {
@@ -56,7 +56,7 @@ const request3: IRequest = {
   data: {
     owner: {
       value: "0x8BB0516Ed242C2e1EDD507f51497fFF83CbAA5ef",
-      type: { regularType: "address" },
+      type: { regularType: "address payable" },
       isUpdateable: true,
     },
     propertyAddress: {
