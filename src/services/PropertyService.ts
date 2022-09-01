@@ -1,33 +1,25 @@
-import { createContractManager } from "gifflar-library";
-import { IWeb3 } from "gifflar-library/bin/modules/deployer/types/IWeb3";
-import { IContractDeployDTO } from "gifflar-library/bin/modules/managing/contract/types/IContractDeployDTO";
-import { IGifflarContractManager } from "gifflar-library/bin/modules/managing/contractManager/types/IGifflarContractManager";
-import { IGifflarContract } from "gifflar-library/bin/modules/managing/contract/types/IGifflarContract";
-import { IContractJson } from "gifflar-library/bin/modules/models/contract/types/IContractJson";
+import { networks, defaultNetwork } from "../../gifflarconfig.json";
 import { Contract } from "web3-eth-contract";
-import { IRequest } from "../../types/IRequest";
+import { IRequest } from "../types/IRequest";
+import { createGifflarManager } from "gifflar-library";
+import { IGifflarManager } from "gifflar-library/bin/modules/managing/gifflarManager/types/IGifflarManager";
+import { IGifflarContract } from "gifflar-library/bin/modules/managing/gifflarContract/types/IGifflarContract";
+import { IContractJson } from "gifflar-library/bin/modules/models/toplevels/contract/types/IContractJson";
+import { IContractDeployDTO } from "gifflar-library/bin/modules/managing/gifflarContract/types/IContractDeployDTO";
 
 class PropertyService {
   // Creating contract manager
-  private myContractManager: IGifflarContractManager = createContractManager();
+  private myGifflarManager: IGifflarManager = createGifflarManager();
 
-  constructor(web3?: IWeb3, accountPrivateKey?: string) {
-    // Setting web3
-    if (web3) {
-      this.myContractManager.setWeb3(web3);
-    }
-
-    // Saving account to memory
-    if (accountPrivateKey && web3) {
-      const account = web3.eth.accounts.privateKeyToAccount(accountPrivateKey);
-      web3.eth.accounts.wallet.add(account);
-    }
+  constructor(accountPrivateKey?: string) {
+    this.myGifflarManager.setDeployConfig(networks[defaultNetwork]);
+    if (accountPrivateKey) this.myGifflarManager.addSigner(accountPrivateKey);
   }
 
   createModel(contractName: string, request: IRequest): IContractJson {
     // Creating new contract
     const myContract: IGifflarContract =
-      this.myContractManager.newContract(contractName);
+      this.myGifflarManager.newContract(contractName);
 
     const requestData = request.data;
     const keys = Object.keys(requestData);
@@ -48,7 +40,7 @@ class PropertyService {
         // Creating updateable function if needed
         myContract
           .createFunction(`set${key}`, "public", [
-            { name: `new${key}`, type: requestData[key].type },
+            { name: `new${key}`, type: requestData[key].type.regularType },
           ])
           .setAssignment(key, `${`new${key}`}`);
       }
@@ -56,7 +48,7 @@ class PropertyService {
 
     // If is rentable, create a function to define the renter
     if (request.config && request.config.isRentable) {
-      myContract.createVariable(`address`, `renter`, "public");
+      myContract.createVariable({ regularType: `address` }, `renter`, "public");
 
       // Creating updateable function if needed
       myContract
@@ -69,16 +61,16 @@ class PropertyService {
     return myContract.toJson();
   }
 
-  write(json: Array<IContractJson>): string {
-    return this.myContractManager.write(json);
+  write(): string {
+    return this.myGifflarManager.writeAll();
   }
 
   compile(contractName: string, callback: (errors: any) => void): any {
-    return this.myContractManager.compile(contractName, callback);
+    return this.myGifflarManager.compile(contractName, callback);
   }
 
   deploy(contractName: string, inputs: IContractDeployDTO): Promise<Contract> {
-    return this.myContractManager.deploy(contractName, inputs);
+    return this.myGifflarManager.deploy(contractName, inputs);
   }
 }
 

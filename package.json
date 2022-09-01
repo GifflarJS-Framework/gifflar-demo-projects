@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/GifflarJS-Framework/gifflar-demo-property#readme",
   "dependencies": {
-    "gifflar": "git+https://github.com/GifflarJS-Framework/core.git#build"
+    "gifflar-library": "git+https://github.com/GifflarJS-Framework/gifflar-library.git#build"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.0",
@@ -30,6 +30,7 @@
     "@babel/preset-typescript": "^7.16.7",
     "@types/node": "^17.0.43",
     "ts-node-dev": "^2.0.0",
+    "types-gifflar": "git+https://github.com/GifflarJS-Framework/types-gifflar.git",
     "typescript": "^4.7.3"
   }
 }
