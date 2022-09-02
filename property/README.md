@@ -2,7 +2,7 @@ This project was bootstrapped with [Gifflar](https://github.com/GifflarJS-Framew
 
 # Gifflar Demo Property
 
-This project is a demo example of using gifflar. Imagine a system that allows properties management through blockchain.
+This project is a demo example of using Gifflar. Imagine a system that allows properties management through blockchain.
 In this system, the manager can create a new management to a property and also to keep managing the property.
 
 The management creation can be the property data, as `property address`, `current owner`, `built date`. But we can also
