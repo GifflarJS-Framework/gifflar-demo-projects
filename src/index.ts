@@ -1,5 +1,6 @@
 import PropertyService from "./services/PropertyService";
 import { IRequest } from "./types/IRequest";
+import fs from "fs";
 
 const propertyService = new PropertyService();
 
@@ -7,7 +8,7 @@ const request1: IRequest = {
   data: {
     owner: {
       value: "0x8BB0516Ed242C2e1EDD507f51497fFF83CbAA5ef",
-      type: { regularType: "address" },
+      type: { regularType: "address payable" },
       isUpdateable: true,
     },
     propertyAddress: {
@@ -20,16 +21,26 @@ const request1: IRequest = {
       type: { regularType: "uint256" },
       isUpdateable: false,
     },
+    forSale: {
+      value: "false",
+      type: { regularType: "bool" },
+      isUpdateable: false,
+    },
+    priceInCrypto: {
+      value: "2000000000000000000000",
+      type: { regularType: "uint256" },
+      isUpdateable: true,
+    },
   },
 };
 
-const contract1 = propertyService.createModel("Contract1", request1);
+propertyService.createModel("Contract1", request1);
 
 const request2: IRequest = {
   data: {
     owner: {
       value: "0x8BB0516Ed242C2e1EDD507f51497fFF83CbAA5ef",
-      type: { regularType: "address" },
+      type: { regularType: "address payable" },
       isUpdateable: true,
     },
     propertyAddress: {
@@ -47,10 +58,20 @@ const request2: IRequest = {
       type: { regularType: "string" },
       isUpdateable: false,
     },
+    forSale: {
+      value: "false",
+      type: { regularType: "bool" },
+      isUpdateable: false,
+    },
+    priceInCrypto: {
+      value: "2000000000000000000000",
+      type: { regularType: "uint256" },
+      isUpdateable: true,
+    },
   },
 };
 
-const contract2 = propertyService.createModel("Contract2", request2);
+propertyService.createModel("Contract2", request2);
 
 const request3: IRequest = {
   data: {
@@ -74,12 +95,34 @@ const request3: IRequest = {
       type: { regularType: "string" },
       isUpdateable: false,
     },
+    forSale: {
+      value: "false",
+      type: { regularType: "bool" },
+      isUpdateable: false,
+    },
+    priceInCrypto: {
+      value: "2000000000000000000000",
+      type: { regularType: "uint256" },
+      isUpdateable: true,
+    },
   },
   config: {
     isRentable: true,
   },
 };
 
-const contract3 = propertyService.createModel("Contract3", request3);
+propertyService.createModel("Contract3", request3);
 
-console.log(propertyService.write());
+// Writing contracts
+const code = propertyService.write();
+
+// Saving contracts to a file
+fs.mkdirSync("./src/contracts", { recursive: true });
+fs.writeFile(
+  "./src/contracts/MyContracts.sol",
+  code,
+  { flag: "w" },
+  (err: Error | null) => {
+    if (err) throw err;
+  }
+);

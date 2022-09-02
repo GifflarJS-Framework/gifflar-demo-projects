@@ -53,6 +53,20 @@ class PropertyService {
       }
     });
 
+    // Defining function to sell the property
+    myContract
+      .createFunction(
+        "buy",
+        "public",
+        [{ type: "address payable", name: "_payer" }],
+        [],
+        "payable"
+      )
+      .setRequire("msg.value == priceInCrypto", "Invalid amount")
+      .setMethodCall("owner", "transfer", "msg.value")
+      .setAssignment("forSale", "false")
+      .setAssignment("owner", "_payer");
+
     // If is rentable, create a function to define the renter
     if (request.config && request.config.isRentable) {
       myContract.createVariable({ regularType: `address` }, `renter`, "public");
