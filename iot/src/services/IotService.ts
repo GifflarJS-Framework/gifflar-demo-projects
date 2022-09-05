@@ -119,12 +119,12 @@ class IotService {
     this.deviceMeasures.map((v) => {
       if (v.max) {
         contract.createEvent(`${v.idv}Overflow`, [
-          { name: `${v.idv}`, type: v.type },
+          { name: `${v.idv}`, type: { regularType: v.type } },
         ]);
       }
       if (v.min) {
         contract.createEvent(`${v.idv}Underflow`, [
-          { name: `${v.idv}`, type: v.type },
+          { name: `${v.idv}`, type: { regularType: v.type } },
         ]);
       }
     });
@@ -231,7 +231,7 @@ class IotService {
         "newContract",
         "new " + controlledName + "(_owner)"
       )
-      .setMethodCall("contracts", "push", "newContract")
+      .setMethodCall("contracts", "push", ["newContract"])
       .setAssignment("counter", "counter + 1");
 
     contract
@@ -239,7 +239,7 @@ class IotService {
         "getLastContract",
         "public",
         [],
-        [{ type: controlledName }],
+        [{ type: { customType: controlledName } }],
         "view"
       )
       .setVariable({ customType: controlledName }, "lastContract", "")

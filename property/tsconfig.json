@@ -6,10 +6,10 @@
     "rootDir": "./",
     "strict": true,
     "strictPropertyInitialization": false,
-    "baseUrl": "property/src",
+    "baseUrl": "./src",
     "types": [],
     "paths": {},
-    "typeRoots": ["property/src/types"],
+    "typeRoots": ["./src/types"],
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
@@ -21,6 +21,6 @@
     "allowJs": true,
     "emitDeclarationOnly": false
   },
-  "exclude": ["./bin/index.ts", "property/src/**/**.spec.ts"],
-  "include": ["node_modules/@types", "property/src/**/**.ts"]
+  "exclude": ["./bin/index.ts", "./src/**/**.spec.ts"],
+  "include": ["node_modules/@types", "./src/**/**.ts"]
 }

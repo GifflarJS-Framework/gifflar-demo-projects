@@ -46,7 +46,7 @@ class PropertyService {
           .createFunction(`set${key}`, "public", [
             {
               name: `new${key}`,
-              type: requestData[key].type.regularType || "",
+              type: { regularType: requestData[key].type.regularType },
             },
           ])
           .setAssignment(key, `${`new${key}`}`);
@@ -58,12 +58,12 @@ class PropertyService {
       .createFunction(
         "buy",
         "public",
-        [{ type: "address payable", name: "_payer" }],
+        [{ type: { regularType: "address payable" }, name: "_payer" }],
         [],
         "payable"
       )
       .setRequire("msg.value == priceInCrypto", "Invalid amount")
-      .setMethodCall("owner", "transfer", "msg.value")
+      .setMethodCall("owner", "transfer", ["msg.value"])
       .setAssignment("forSale", "false")
       .setAssignment("owner", "_payer");
 
@@ -74,7 +74,7 @@ class PropertyService {
       // Creating updateable function if needed
       myContract
         .createFunction(`setRenter`, "public", [
-          { name: `newRenter`, type: "address" },
+          { name: `newRenter`, type: { regularType: "address" } },
         ])
         .setAssignment(`renter`, `newRenter`);
 
@@ -83,12 +83,12 @@ class PropertyService {
         .createFunction(
           "payRent",
           "public",
-          [{ type: "address", name: "_renter" }],
+          [{ type: { regularType: "address" }, name: "_renter" }],
           [],
           "payable"
         )
         .setRequire("_renter == renter", "Payer is not renter.")
-        .setMethodCall("owner", "transfer", "msg.value");
+        .setMethodCall("owner", "transfer", ["msg.value"]);
     }
 
     return myContract.toJson();
