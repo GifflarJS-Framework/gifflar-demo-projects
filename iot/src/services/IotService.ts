@@ -135,11 +135,11 @@ class IotService {
     const constructor = contract
       .createConstructor("public")
       .setInput({ regularType: "address" }, "_owner")
-      .setAssignment("manager", "_owner");
+      .setAssignment("manager", { customExpression: "_owner" });
 
     // Setting up all definitions
     this.definitions.map((def) => {
-      constructor.setAssignment(def.variable, def.value);
+      constructor.setAssignment(def.variable, { customExpression: def.value });
     });
 
     // Reseting the definitions (needed for when creating controller contract)
@@ -154,7 +154,7 @@ class IotService {
         contract
           .createFunction("set" + this._capitalize(v.idv), "public")
           .setInput({ regularType: v.type }, "_" + v.idv)
-          .setAssignment(v.idv, "_" + v.idv);
+          .setAssignment(v.idv, { customExpression: `_${v.idv}` });
       }
 
       //Setting max and min variables
@@ -164,7 +164,7 @@ class IotService {
         contract
           .createFunction(`set${this._capitalize(maxname)}`, "public")
           .setInput({ regularType: v.type }, "_" + maxname)
-          .setAssignment(maxname, "_" + maxname);
+          .setAssignment(maxname, { customExpression: `_${maxname}` });
       }
       if (v.min) {
         const minname = "min" + this._capitalize(v.idv);
@@ -172,7 +172,7 @@ class IotService {
         contract
           .createFunction("set" + this._capitalize(minname), "public")
           .setInput({ regularType: v.type }, "_" + minname)
-          .setAssignment(minname, "_" + minname);
+          .setAssignment(minname, { customExpression: `_${minname}` });
       }
     });
   }
@@ -199,7 +199,7 @@ class IotService {
       const setMeasure = contract
         .createFunction("set" + this._capitalize(v.idv), "public")
         .setInput({ regularType: v.type }, "_" + v.idv)
-        .setAssignment(v.idv, "_" + v.idv);
+        .setAssignment(v.idv, { customExpression: `_${v.idv}` });
       if (v.max) {
         setMeasure
           .beginIf(v.idv + " <= max" + this._capitalize(v.idv))
@@ -221,18 +221,18 @@ class IotService {
       "contracts",
       "public"
     );
-    contract.createVariable({ regularType: "uint" }, "counter", "private", "0");
+    contract.createVariable({ regularType: "uint" }, "counter", "private", {
+      customExpression: "0",
+    });
 
     contract
       .createFunction("createContract", "public")
       .setInput({ regularType: "address" }, "_owner")
-      .setVariable(
-        { customType: controlledName },
-        "newContract",
-        "new " + controlledName + "(_owner)"
-      )
+      .setVariable({ customType: controlledName }, "newContract", {
+        customExpression: `new ${controlledName}(_owner)`,
+      })
       .setMethodCall("contracts", "push", ["newContract"])
-      .setAssignment("counter", "counter + 1");
+      .setAssignment("counter", { customExpression: "counter + 1" });
 
     contract
       .createFunction(
@@ -242,12 +242,14 @@ class IotService {
         [{ type: { customType: controlledName } }],
         "view"
       )
-      .setVariable({ customType: controlledName }, "lastContract", "")
+      .setVariable({ customType: controlledName }, "lastContract")
       .beginIf("counter > 0")
-      .setAssignment("lastContract", "contracts[counter - 1]")
+      .setAssignment("lastContract", {
+        customExpression: "contracts[counter - 1]",
+      })
       .endIf()
       .beginElse()
-      .setAssignment("lastContract", "contracts[0]")
+      .setAssignment("lastContract", { customExpression: "contracts[0]" })
       .endElse();
   }
 }

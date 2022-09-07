@@ -30,14 +30,12 @@ class PropertyService {
 
     keys.map((key) => {
       // Creating a contract variable
-      myContract.createVariable(
-        requestData[key].type,
-        key,
-        "public",
-        requestData[key].type.regularType === "string"
-          ? `"${requestData[key].value}"`
-          : `${requestData[key].value}`
-      );
+      myContract.createVariable(requestData[key].type, key, "public", {
+        customExpression:
+          requestData[key].type.regularType === "string"
+            ? `"${requestData[key].value}"`
+            : `${requestData[key].value}`,
+      });
 
       // If is updateable, creates a set function
       if (requestData[key].isUpdateable) {
@@ -49,7 +47,7 @@ class PropertyService {
               type: { regularType: requestData[key].type.regularType },
             },
           ])
-          .setAssignment(key, `${`new${key}`}`);
+          .setAssignment(key, { customExpression: `${`new${key}`}` });
       }
     });
 
@@ -64,8 +62,8 @@ class PropertyService {
       )
       .setRequire("msg.value == priceInCrypto", "Invalid amount")
       .setMethodCall("owner", "transfer", ["msg.value"])
-      .setAssignment("forSale", "false")
-      .setAssignment("owner", "_payer");
+      .setAssignment("forSale", { customExpression: "false" })
+      .setAssignment("owner", { customExpression: "_payer" });
 
     // If is rentable, create a function to define the renter
     if (request.config && request.config.isRentable) {
@@ -76,7 +74,7 @@ class PropertyService {
         .createFunction(`setRenter`, "public", [
           { name: `newRenter`, type: { regularType: "address" } },
         ])
-        .setAssignment(`renter`, `newRenter`);
+        .setAssignment(`renter`, { customExpression: `newRenter` });
 
       // Creating function to pay rent
       myContract
