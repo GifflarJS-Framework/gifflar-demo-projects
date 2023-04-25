@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/GifflarJS-Framework/gifflar-demo-property#readme",
   "dependencies": {
-    "gifflar-library": "git+https://github.com/GifflarJS-Framework/gifflar-library.git#build"
+    "@gifflar/solgen": "git+https://github.com/GifflarJS-Framework/solgen.git#build"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.0",

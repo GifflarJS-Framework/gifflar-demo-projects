@@ -1,12 +1,12 @@
 import { networks, defaultNetwork } from "../../gifflarconfig.json";
 import { Contract } from "web3-eth-contract";
 import { IRequest } from "../types/IRequest";
-import { createGifflarManager } from "gifflar-library";
-import { IGifflarManager } from "gifflar-library/bin/modules/managing/gifflarManager/types/IGifflarManager";
-import { IGifflarContract } from "gifflar-library/bin/modules/managing/gifflarContract/types/IGifflarContract";
-import { IContractJson } from "gifflar-library/bin/modules/models/toplevels/contract/types/IContractJson";
-import { IContractDeployDTO } from "gifflar-library/bin/modules/managing/gifflarContract/types/IContractDeployDTO";
-import { INetworkConfig } from "gifflar-library/bin/modules/deployer/types/INetworkConfig";
+import { createGifflarManager } from "@gifflar/solgen";
+import { IGifflarManager } from "@gifflar/solgen/bin/modules/managing/gifflarManager/types/IGifflarManager";
+import { IGifflarContract } from "@gifflar/solgen/bin/modules/managing/gifflarContract/types/IGifflarContract";
+import { IContractJson } from "@gifflar/solgen/bin/modules/models/toplevels/contract/types/IContractJson";
+import { IContractDeployDTO } from "@gifflar/solgen/bin/modules/managing/gifflarContract/types/IContractDeployDTO";
+import { INetworkConfig } from "@gifflar/solgen/bin/modules/deployer/types/INetworkConfig";
 
 class PropertyService {
   // Creating contract manager
@@ -31,10 +31,10 @@ class PropertyService {
     keys.map((key) => {
       // Creating a contract variable
       myContract.createVariable(requestData[key].type, key, "public", {
-        customExpression:
-          requestData[key].type.regularType === "string"
+        expressionValue:{
+          customExpression: requestData[key].type.regularType === "string"
             ? `"${requestData[key].value}"`
-            : `${requestData[key].value}`,
+            : `${requestData[key].value}`,}
       });
 
       // If is updateable, creates a set function
@@ -58,7 +58,7 @@ class PropertyService {
         "public",
         [{ type: { regularType: "address payable" }, name: "_payer" }],
         [],
-        "payable"
+        {stateMutability: "payable"}
       )
       .setRequire("msg.value == priceInCrypto", "Invalid amount")
       .setMethodCall("owner", "transfer", ["msg.value"])
@@ -83,7 +83,7 @@ class PropertyService {
           "public",
           [{ type: { regularType: "address" }, name: "_renter" }],
           [],
-          "payable"
+          {stateMutability: "payable"}
         )
         .setRequire("_renter == renter", "Payer is not renter.")
         .setMethodCall("owner", "transfer", ["msg.value"]);

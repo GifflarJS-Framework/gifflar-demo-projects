@@ -1,9 +1,9 @@
 import { networks, defaultNetwork } from "../../gifflarconfig.json";
-import { createGifflarManager } from "gifflar-library";
-import { IContractDeployDTO } from "gifflar-library/bin/modules/managing/gifflarContract/types/IContractDeployDTO";
-import { IGifflarManager } from "gifflar-library/bin/modules/managing/gifflarManager/types/IGifflarManager";
-import { IGifflarContract } from "gifflar-library/bin/modules/managing/gifflarContract/types/IGifflarContract";
-import { INetworkConfig } from "gifflar-library/bin/modules/deployer/types/INetworkConfig";
+import { createGifflarManager } from "@gifflar/solgen";
+import { IContractDeployDTO } from "@gifflar/solgen/bin/modules/managing/gifflarContract/types/IContractDeployDTO";
+import { IGifflarManager } from "@gifflar/solgen/bin/modules/managing/gifflarManager/types/IGifflarManager";
+import { IGifflarContract } from "@gifflar/solgen/bin/modules/managing/gifflarContract/types/IGifflarContract";
+import { INetworkConfig } from "@gifflar/solgen/bin/modules/deployer/types/INetworkConfig";
 import { Contract } from "web3-eth-contract";
 import { IIoTValue } from "../types/IIoTValue";
 import { IIoTSensorData } from "../types/IIoTSensorData";
@@ -133,7 +133,7 @@ class IotService {
   _setupConstructor(contract: IGifflarContract) {
     // Starting the constructor
     const constructor = contract
-      .createConstructor("public")
+      .createConstructor()
       .setInput({ regularType: "address" }, "_owner")
       .setAssignment("manager", { customExpression: "_owner" });
 
@@ -183,7 +183,7 @@ class IotService {
       "public",
       [],
       [],
-      "view"
+      {stateMutability: "view"}
     );
 
     const returnValues: string[] = [];
@@ -222,14 +222,14 @@ class IotService {
       "public"
     );
     contract.createVariable({ regularType: "uint" }, "counter", "private", {
-      customExpression: "0",
+      expressionValue: {customExpression: "0"},
     });
 
     contract
       .createFunction("createContract", "public")
       .setInput({ regularType: "address" }, "_owner")
       .setVariable({ customType: controlledName }, "newContract", {
-        customExpression: `new ${controlledName}(_owner)`,
+        expressionValue: {customExpression: `new ${controlledName}(_owner)`},
       })
       .setMethodCall("contracts", "push", ["newContract"])
       .setAssignment("counter", { customExpression: "counter + 1" });
@@ -240,7 +240,7 @@ class IotService {
         "public",
         [],
         [{ type: { customType: controlledName } }],
-        "view"
+        {stateMutability: "view"}
       )
       .setVariable({ customType: controlledName }, "lastContract")
       .beginIf("counter > 0")
